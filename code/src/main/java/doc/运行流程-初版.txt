@@ -1,0 +1,44 @@
+1、首先创建一个数据库benchmarksql，设置用户和密码
+2、在根目录下，先进行编译
+$maven package
+3、编译成功后进入/HTAP-Bench/run目录下，配置props.pg文件
+terminals=6//表示线程数
+runTxnsPerTerminal=0且runMins=1//表示设定运行时长为1min
+limitTxnsPerMin=0//表示指定每分钟事务执行数量的上限，通常为0
+APTerminals=1//表示指定AP执行流的数量，现在只能为1；为0表示纯TP执行
+testTimeInterval=30//表示AP查询采集时间间隔
+dynamicParam=1//这里设定动态参数调整的模式，为1表示原始查询没有参数调整，为0表示做了参数调整，等于0的情况还没有修改完
+numTerminalsSync=0//表示同步线程数量
+4、先进行数据的加载，再进行执行
+$./runDatabaseBuild.sh props.pg     //加载初始数据
+$./runBenchmark.sh props.pg         //运行benchamrk,运行前需要在/run目录下建目录/result
+$./runDatabaseDestroy.sh props.pg   //删除表
+
+ps:
+1. 运行前需要在/run下建result文件夹;
+2. ap查询运算时出现除数为零的情况，在Q8和Q14中将除法改成了乘法
+3. sh文件可能有格式问题windows转linux,但是不建议使用这个文件做格式转换，而是用vi打开文件然后设置:set ff=unix
+4. sh文件如果不是可执行状态需要用chmod +x xxxxx.sh
+
+baseQuery.java中以下两个参数需要修改
+    public int orderOriginSize=30000;
+    public int olOriginSize=300000;
+generalOorderTSize是装oorder表实时大小的数据集，类型为list
+generalOrderlineTSize是装orderline表实时大小的数据集，类型为list
+
+删除数据库时出现卡住的情况时：
+1、首先断开数据库的所有链接
+```
+select * from pg_stat_activity;
+SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='benchmarksql' AND pg_stat_activity.pid<>pg_backend_pid();
+```
+2、然后再用./runDatabaseDestroy props.pg删除
+
+连接池参数
+ <dbtype>mysql</dbtype>
+    <driver>com.mysql.jdbc.Driver</driver>
+    <DBUrl>jdbc:mysql://10.24.14.69:2883/chbenchmark?rewriteBatchedStatements=true&amp;allowMultiQueries=true&amp;useLocalSessionState=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;socketTimeout=3000000</DBUrl>
+    <username>root@test</username>
+    <password></password>
+    <isolation>TRANSACTION_REPEATABLE_READ</isolation>
+
