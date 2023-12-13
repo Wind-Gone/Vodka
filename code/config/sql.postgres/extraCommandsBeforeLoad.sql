@@ -1,0 +1,6 @@
+ALTER TABLE vodka_oorder SET (FILLFACTOR = 80);
+ALTER TABLE vodka_order_line SET (FILLFACTOR = 80);
+ALTER TABLE vodka_warehouse SET (FILLFACTOR = 50);
+ALTER TABLE vodka_district SET (FILLFACTOR = 79);
+ALTER TABLE vodka_customer SET (FILLFACTOR = 90);
+ALTER TABLE vodka_stock SET (FILLFACTOR = 95);
