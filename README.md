@@ -18,8 +18,7 @@ yum install -y ant java-1.8* apache-ivy
 yum install -y git
 git clone https://github.com/Wind-Gone/Vodka --recursive
 cd Vodka
-ant resolve
-ant
+mvn package
 ```
 3. Install necessary tools, copy client ssh key to servers, adjust server parameters and synchronize clocks.
 ```bash
